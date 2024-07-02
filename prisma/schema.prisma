@@ -19,21 +19,22 @@ enum Gender {
 
 model User {
   id               Int       @id @default(autoincrement())
-  username         String    @unique @db.VarChar(30)
-  email            String    @db.VarChar(254)
-  phoneNumber      String?   @map("phone_number") @db.VarChar(18)
-  profilePhotoUrl  String    @default("https://i.ibb.co/MhtSNNb/fakegram-user-avatar.jpg") @map("profile_photo_url")
-  fullDateBirth    DateTime? @map("full_date_birth")
-  role             Role      @default(USER)
-  aboutMe          String?   @map("about_me") @db.VarChar(150)
-  bio              String?   @db.VarChar(30)
-  websiteUrl       String?   @map("website_url")
+  name             String?   @db.Text
+  username         String    @unique @db.Text
+  email            String    @db.Text
+  password         String    @db.Text
+  phoneNumber      String?   @map("phone_number") @db.Text
+  country          String?   @db.Text
+  profilePhotoUrl  String?   @default("https://i.ibb.co/MhtSNNb/fakegram-user-avatar.jpg") @map("profile_photo_url")
+  fullDateBirth    DateTime @map("full_date_birth")
+  roles            Role[]    @default([USER])
+  aboutMe          String?   @map("about_me") @db.Text
   gender           Gender?
-  registrationDate DateTime  @default(now()) @map("registration_date")
-  lastLoginDate    DateTime  @default(now()) @map("last_login_date")
-  isVerified       Boolean   @default(false) @map("is_verified")
-  isPrivate        Boolean   @default(false) @map("is_private")
-  emailVerified    Boolean   @default(false) @map("email_verified")
+  registrationDate DateTime? @default(now()) @map("registration_date")
+  lastLoginDate    DateTime? @default(now()) @map("last_login_date")
+  isVerified       Boolean?  @default(false) @map("is_verified")
+  isPrivate        Boolean?  @default(false) @map("is_private")
+  emailVerified    Boolean?  @default(false) @map("email_verified")
 
   @@index([username])
 }
