@@ -37,13 +37,13 @@ export class UserAuthService implements IUserAuthService {
       this.configService.get('SECRET_PASSWORD_KEY'),
     ).toString();
 
-    const userRegistrationDto = new UserRegistrationDto({
+    const userRegistrationData = {
       ...dto,
       password: hashPassword,
-    });
+    };
 
     const newUser =
-      await this.userAuthRepository.createUser(userRegistrationDto);
+      await this.userAuthRepository.createUser(userRegistrationData);
 
     const tokens = await this.jwtTokenService.generateTokens(
       new GenerateJwtTokenDto(newUser),

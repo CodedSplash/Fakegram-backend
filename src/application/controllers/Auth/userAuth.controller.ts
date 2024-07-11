@@ -16,9 +16,7 @@ export class UserAuthController {
     @Body() dto: UserRegistrationDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { user, jwt } = await this.userAuthService.registration(
-      new UserRegistrationDto(dto),
-    );
+    const { user, jwt } = await this.userAuthService.registration(dto);
 
     res.cookie('refreshToken', jwt.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
