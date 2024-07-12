@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('Fakegram API')
     .setDescription('Документация по Fakegram API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('swagger', app, swaggerDocument);
