@@ -7,15 +7,16 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import {
+  MAX_NAME_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  MAX_USERNAME_LENGTH,
+  MIN_AGE,
+  MIN_NAME_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  MIN_USERNAME_LENGTH,
+} from '../../../common/constants/validation.constants';
 import { IsOlderThan } from '../../../common/decorators/isOlderThan.decorator';
-
-const MIN_NAME_LENGTH = 2;
-const MAX_NAME_LENGTH = 50;
-const MIN_USERNAME_LENGTH = 6;
-const MAX_USERNAME_LENGTH = 20;
-const MIN_PASSWORD_LENGTH = 8;
-const MAX_PASSWORD_LENGTH = 15;
-const MIN_AGE = 13;
 
 export class UserRegistrationDto {
   @IsOptional()
