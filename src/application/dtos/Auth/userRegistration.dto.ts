@@ -17,47 +17,56 @@ import {
   MIN_USERNAME_LENGTH,
 } from '../../../common/constants/validation.constants';
 import { IsOlderThan } from '../../../common/decorators/isOlderThan.decorator';
+import {
+  fieldNotEmptyMessage,
+  fieldTypeMessage,
+  generateMaxLengthMessage,
+  generateMinLengthMessage,
+} from '../../../common/utils/validationMessages.util';
 
 export class UserRegistrationDto {
   @IsOptional()
-  @IsString({ message: 'Поле name должно быть строкой' })
+  @IsString({ message: fieldTypeMessage('name', 'строкой') })
   @MinLength(MIN_NAME_LENGTH, {
-    message: `Минимальная длина поля name должна составлять не менее ${MIN_NAME_LENGTH} символов`,
+    message: generateMinLengthMessage('name', MIN_NAME_LENGTH),
   })
   @MaxLength(MAX_NAME_LENGTH, {
-    message: `Максимальная длина поля name должна составлять не более ${MAX_NAME_LENGTH} символов`,
+    message: generateMaxLengthMessage('name', MAX_NAME_LENGTH),
   })
   readonly name?: string;
 
-  @IsNotEmpty({ message: 'Поле username не должно быть пустым' })
-  @IsString({ message: 'Поле username должно быть строкой' })
+  @IsNotEmpty({ message: fieldNotEmptyMessage('username') })
+  @IsString({ message: fieldTypeMessage('username', 'строкой') })
   @MinLength(MIN_USERNAME_LENGTH, {
-    message: `Минимальная длина поля username должна составлять не менее ${MIN_USERNAME_LENGTH} символов`,
+    message: generateMinLengthMessage('username', MIN_USERNAME_LENGTH),
   })
   @MaxLength(MAX_USERNAME_LENGTH, {
-    message: `Максимальная длина поля username должна составлять не более ${MAX_USERNAME_LENGTH} символов`,
+    message: generateMaxLengthMessage('username', MAX_USERNAME_LENGTH),
   })
   readonly username: string;
 
-  @IsNotEmpty({ message: 'Поле email не должно быть пустым' })
-  @IsEmail({}, { message: 'Поле email должно быть почтой' })
+  @IsNotEmpty({ message: fieldNotEmptyMessage('email') })
+  @IsEmail({}, { message: fieldTypeMessage('email', 'почтой') })
   readonly email: string;
 
-  @IsNotEmpty({ message: 'Поле password не должно быть пустым' })
-  @IsString({ message: 'Поле password должно быть строкой' })
+  @IsNotEmpty({ message: fieldNotEmptyMessage('password') })
+  @IsString({ message: fieldTypeMessage('password', 'строкой') })
   @MinLength(MIN_PASSWORD_LENGTH, {
-    message: `Минимальная длина поля password должна составлять не менее ${MIN_PASSWORD_LENGTH} символов`,
+    message: generateMinLengthMessage('password', MIN_PASSWORD_LENGTH),
   })
   @MaxLength(MAX_PASSWORD_LENGTH, {
-    message: `Максимальная длина поля password должна составлять не более ${MAX_PASSWORD_LENGTH} символов`,
+    message: generateMaxLengthMessage('password', MAX_PASSWORD_LENGTH),
   })
   readonly password: string;
 
-  @IsNotEmpty({ message: 'Поле fullDateBirth не должно быть пустым' })
+  @IsNotEmpty({ message: fieldNotEmptyMessage('fullDateBirth') })
   @IsDateString(
     {},
     {
-      message: 'Поле fullDateBirth должно быть строковой датой формата ISO8601',
+      message: fieldTypeMessage(
+        'fullDateBirth',
+        'строковой датой формата ISO8601',
+      ),
     },
   )
   @IsOlderThan(MIN_AGE, {
