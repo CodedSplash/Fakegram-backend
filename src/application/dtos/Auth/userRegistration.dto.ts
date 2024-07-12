@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
   IsEmail,
@@ -17,6 +18,7 @@ import {
   MIN_USERNAME_LENGTH,
 } from '../../../common/constants/validation.constants';
 import { IsOlderThan } from '../../../common/decorators/isOlderThan.decorator';
+import { userRegistrationRequestExample } from '../../../common/swagger/examples/Auth/userRegistrationRequest.example';
 import {
   fieldNotEmptyMessage,
   fieldTypeMessage,
@@ -25,6 +27,12 @@ import {
 } from '../../../common/utils/validationMessages.util';
 
 export class UserRegistrationDto {
+  @ApiProperty({
+    required: false,
+    minLength: MIN_NAME_LENGTH,
+    maxLength: MAX_NAME_LENGTH,
+    example: userRegistrationRequestExample.name,
+  })
   @IsOptional()
   @IsString({ message: fieldTypeMessage('name', 'строкой') })
   @MinLength(MIN_NAME_LENGTH, {
@@ -35,6 +43,11 @@ export class UserRegistrationDto {
   })
   readonly name?: string;
 
+  @ApiProperty({
+    minLength: MIN_USERNAME_LENGTH,
+    maxLength: MAX_USERNAME_LENGTH,
+    example: userRegistrationRequestExample.username,
+  })
   @IsNotEmpty({ message: fieldNotEmptyMessage('username') })
   @IsString({ message: fieldTypeMessage('username', 'строкой') })
   @MinLength(MIN_USERNAME_LENGTH, {
@@ -45,10 +58,18 @@ export class UserRegistrationDto {
   })
   readonly username: string;
 
+  @ApiProperty({
+    example: userRegistrationRequestExample.email,
+  })
   @IsNotEmpty({ message: fieldNotEmptyMessage('email') })
   @IsEmail({}, { message: fieldTypeMessage('email', 'почтой') })
   readonly email: string;
 
+  @ApiProperty({
+    minLength: MIN_PASSWORD_LENGTH,
+    maxLength: MAX_PASSWORD_LENGTH,
+    example: userRegistrationRequestExample.password,
+  })
   @IsNotEmpty({ message: fieldNotEmptyMessage('password') })
   @IsString({ message: fieldTypeMessage('password', 'строкой') })
   @MinLength(MIN_PASSWORD_LENGTH, {
@@ -59,6 +80,11 @@ export class UserRegistrationDto {
   })
   readonly password: string;
 
+  @ApiProperty({
+    description:
+      'Полная дата рождения пользователя в формате ISO 8601. Пользователю должно быть не менее 13 лет',
+    example: userRegistrationRequestExample.fullDateBirth,
+  })
   @IsNotEmpty({ message: fieldNotEmptyMessage('fullDateBirth') })
   @IsDateString(
     {},
