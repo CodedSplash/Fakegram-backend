@@ -1,5 +1,6 @@
 import { getSchemaPath } from '@nestjs/swagger';
-import { DefaultErrorResponseType } from '../../../types/defaultErrorResponse.type';
+
+import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
 
 export const refreshTokenAuthorizationErrorExample = {
   summary: 'Ошибка авторизации!',
@@ -31,8 +32,8 @@ export const refreshTokenUnauthorized = {
   'application/json': {
     schema: {
       oneOf: [
-        { $ref: getSchemaPath(DefaultErrorResponseType) },
-        { $ref: getSchemaPath(DefaultErrorResponseType) },
+        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
+        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
       ],
     },
     examples: {

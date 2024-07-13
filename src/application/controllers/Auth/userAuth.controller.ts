@@ -11,6 +11,8 @@ import { userRegistrationBadRequestExample } from '../../../common/swagger/examp
 import { userRegistrationCreateExample } from '../../../common/swagger/examples/Auth/userRegistrationCreate.example';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
 import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
+
+import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
 import { ValidationErrorResponseType } from '../../../common/types/validationErrorResponse.type';
 import { UserAuthService } from '../../../core/Auth/servicies/userAuth.service';
 import { IUserAuthService } from '../../../core/Auth/servicies/userAuth.service.interface';
@@ -19,7 +21,7 @@ import { UserResponseDto } from '../../dtos/Auth/userResponse.dto';
 
 @Controller('auth')
 @ApiTags('Registration')
-@ApiExtraModels(ValidationErrorResponseType, DefaultErrorResponseType)
+@ApiExtraModels(ValidationErrorResponseType, DetailedInfoErrorResponseType)
 export class UserAuthController {
   constructor(
     @Inject(UserAuthService) private readonly userAuthService: IUserAuthService,
@@ -37,7 +39,7 @@ export class UserAuthController {
   })
   @ApiInternalServerErrorResponse({
     description: 'Ошибка на стороне сервера!',
-    type: DefaultErrorResponseType,
+    type: DetailedInfoErrorResponseType,
     example: internalServerErrorExample('/auth/registration/'),
   })
   async registration(

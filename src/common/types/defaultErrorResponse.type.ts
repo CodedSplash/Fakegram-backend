@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ErrorResponseInfo, ErrorResponseType } from './errorResponse.type';
-
-class DefaultErrorInfo extends ErrorResponseInfo {
-  @ApiProperty()
-  readonly message: string;
-}
+import { ErrorResponseType } from './errorResponse.type';
 
 export class DefaultErrorResponseType extends ErrorResponseType {
   @ApiProperty()
-  readonly error: DefaultErrorInfo;
+  readonly error: string;
 }

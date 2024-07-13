@@ -1,5 +1,6 @@
 import { getSchemaPath } from '@nestjs/swagger';
-import { DefaultErrorResponseType } from '../../../types/defaultErrorResponse.type';
+
+import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
 import { ValidationErrorResponseType } from '../../../types/validationErrorResponse.type';
 
 const userAlreadyRegisteredExample = {
@@ -34,7 +35,7 @@ export const userRegistrationBadRequestExample = {
   'application/json': {
     schema: {
       oneOf: [
-        { $ref: getSchemaPath(DefaultErrorResponseType) },
+        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
         { $ref: getSchemaPath(ValidationErrorResponseType) },
       ],
     },

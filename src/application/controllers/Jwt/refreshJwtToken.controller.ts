@@ -15,13 +15,15 @@ import { refreshTokenResponseExample } from '../../../common/swagger/examples/Jw
 import { refreshTokenUnauthorized } from '../../../common/swagger/examples/Jwt/refreshTokenUnauthorized.example';
 import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
 import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
+
+import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
 import { JwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service';
 import { IJwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service.interface';
 import { RefreshTokenResponseDto } from '../../dtos/Jwt/refreshTokenResponse.dto';
 
 @Controller('jwt_token')
 @ApiTags('Jwt token')
-@ApiExtraModels(DefaultErrorResponseType)
+@ApiExtraModels(DetailedInfoErrorResponseType)
 export class RefreshJwtTokenController {
   constructor(
     @Inject(JwtTokenService) private readonly jwtTokenService: IJwtTokenService,
@@ -45,12 +47,12 @@ export class RefreshJwtTokenController {
   })
   @ApiNotFoundResponse({
     description: 'Пользователь не найден!',
-    type: DefaultErrorResponseType,
+    type: DetailedInfoErrorResponseType,
     example: hasUserNotFoundExample,
   })
   @ApiInternalServerErrorResponse({
     description: 'Ошибка на стороне сервера!',
-    type: DefaultErrorResponseType,
+    type: DetailedInfoErrorResponseType,
     example: internalServerErrorExample('/jwt_token/refresh_token/'),
   })
   async refreshToken(
