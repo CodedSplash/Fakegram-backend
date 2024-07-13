@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ErrorHandlerFilter } from './application/filters/ErrorHandler.filter';
+import { throttlerOptions } from './config/throttler.config';
 import { AuthModule } from './core/Auth/auth.module';
 import { JwtModule } from './core/Jwt/jwt.module';
 import { UserProfileModule } from './core/UserProfile/userProfile.module';
@@ -11,6 +13,7 @@ import { DbModule } from './infrastructure/db/db.module';
   imports: [
     DbModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot(throttlerOptions),
     UserProfileModule,
     JwtModule,
     AuthModule,
@@ -19,6 +22,10 @@ import { DbModule } from './infrastructure/db/db.module';
     {
       provide: APP_FILTER,
       useClass: ErrorHandlerFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
