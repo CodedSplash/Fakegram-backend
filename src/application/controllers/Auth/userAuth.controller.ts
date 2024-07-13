@@ -5,11 +5,13 @@ import {
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiTags,
+  ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { userRegistrationBadRequestExample } from '../../../common/swagger/examples/Auth/userRegistrationBadRequest.example';
 import { userRegistrationCreateExample } from '../../../common/swagger/examples/Auth/userRegistrationCreate.example';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
 import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
 
 import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
@@ -36,6 +38,11 @@ export class UserAuthController {
   @ApiBadRequestResponse({
     description: 'Ошибки связанные с плохим запросом',
     content: userRegistrationBadRequestExample,
+  })
+  @ApiTooManyRequestsResponse({
+    description: 'Слишком много запросов!',
+    type: DefaultErrorResponseType,
+    example: throttlerExceptionExample('/auth/registration'),
   })
   @ApiInternalServerErrorResponse({
     description: 'Ошибка на стороне сервера!',

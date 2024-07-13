@@ -4,8 +4,10 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
 import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
 import { hasUserResponseExample } from '../../../common/swagger/examples/UserProfile/hasUserResponse.example';
 import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
@@ -33,6 +35,11 @@ export class UserProfileController {
     description: 'Пользователь не найден!',
     type: DetailedInfoErrorResponseType,
     example: hasUserNotFoundExample,
+  })
+  @ApiTooManyRequestsResponse({
+    description: 'Слишком много запросов!',
+    type: DefaultErrorResponseType,
+    example: throttlerExceptionExample('/user/has_user/test_1'),
   })
   @ApiInternalServerErrorResponse({
     description: 'Ошибка на стороне сервера!',

@@ -7,10 +7,12 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
 import { refreshTokenResponseExample } from '../../../common/swagger/examples/Jwt/refreshTokenResponse.example';
 import { refreshTokenUnauthorized } from '../../../common/swagger/examples/Jwt/refreshTokenUnauthorized.example';
 import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
@@ -49,6 +51,11 @@ export class RefreshJwtTokenController {
     description: 'Пользователь не найден!',
     type: DetailedInfoErrorResponseType,
     example: hasUserNotFoundExample,
+  })
+  @ApiTooManyRequestsResponse({
+    description: 'Слишком много запросов!',
+    type: DefaultErrorResponseType,
+    example: throttlerExceptionExample('/jwt_token/refresh_token'),
   })
   @ApiInternalServerErrorResponse({
     description: 'Ошибка на стороне сервера!',
