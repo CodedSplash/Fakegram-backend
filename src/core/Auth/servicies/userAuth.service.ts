@@ -30,7 +30,7 @@ export class UserAuthService implements IUserAuthService {
     const hasUser = await this.userService.getByUsername(dto.username);
 
     if (hasUser)
-      throw new BadRequestException('Пользователь уже зарегестрирован');
+      throw new BadRequestException('Пользователь уже зарегистрирован');
 
     const hashPassword = HmacSHA256(
       dto.password,
