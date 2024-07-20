@@ -60,6 +60,9 @@ export class UserAuthController {
       httpOnly: true,
     });
 
-    return new UserResponseDto(user);
+    return {
+      user: new UserResponseDto(user),
+      jwt,
+    };
   }
 }
