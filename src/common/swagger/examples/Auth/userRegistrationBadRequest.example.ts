@@ -1,47 +1,35 @@
-import { getSchemaPath } from '@nestjs/swagger';
-
 import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
 import { ValidationErrorResponseType } from '../../../types/validationErrorResponse.type';
+import {
+  detailedInfoErrorExample,
+  validationErrorExample,
+} from '../../../utils/examplesErrors.util';
+import { manyExamples } from '../../../utils/manyExamples.util';
 
 const userAlreadyRegisteredExample = {
+  type: DetailedInfoErrorResponseType,
   summary: 'Пользователь уже зарегистрирован',
-  value: {
-    status: 400,
-    error: {
-      message: 'Пользователь уже зарегистрирован',
-      error: 'Bad Request',
-      statusCode: 400,
-    },
-    path: '/auth/registration/',
-  },
+  value: detailedInfoErrorExample(
+    400,
+    'Пользователь уже зарегистрирован',
+    'Bad Request',
+    '/auth/registration/',
+  ),
 };
-
-const validationErrorExample = {
+const validationDataErrorExample = {
+  type: ValidationErrorResponseType,
   summary: 'Ошибка при валидации данных',
-  value: {
-    status: 400,
-    error: {
-      message: [
-        'Минимальная длина поля username должна составлять не менее 6 символов',
-      ],
-      error: 'Bad Request',
-      statusCode: 400,
-    },
-    path: '/auth/registration/',
-  },
+  value: validationErrorExample(
+    400,
+    ['Минимальная длина поля username должна составлять не менее 6 символов'],
+    'Bad Request',
+    '/auth/registration/',
+  ),
 };
 
-export const userRegistrationBadRequestExample = {
+export const userRegistrationBadRequestExample = manyExamples({
   'application/json': {
-    schema: {
-      oneOf: [
-        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
-        { $ref: getSchemaPath(ValidationErrorResponseType) },
-      ],
-    },
-    examples: {
-      userAlreadyRegisteredExample,
-      validationErrorExample,
-    },
+    userAlreadyRegisteredExample,
+    validationDataErrorExample,
   },
-};
+});
