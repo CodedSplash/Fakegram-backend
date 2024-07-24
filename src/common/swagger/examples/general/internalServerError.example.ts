@@ -1,11 +1,10 @@
+import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
+
 export const internalServerErrorExample = (path: string) => {
-  return {
-    status: 500,
-    error: {
-      message: 'Ошибка на стороне сервера',
-      error: 'Internal Server Error',
-      statusCode: 500,
-    },
+  return detailedInfoErrorExample(
+    500,
+    'Ошибка на стороне сервера',
+    'Internal Server Error',
     path,
-  };
+  );
 };
