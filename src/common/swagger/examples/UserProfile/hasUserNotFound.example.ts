@@ -1,9 +1,8 @@
-export const hasUserNotFoundExample = {
-  status: 404,
-  error: {
-    message: 'Пользователь не найден!',
-    error: 'Not Found',
-    statusCode: 404,
-  },
-  path: '/user/has_user/test_1',
-};
+import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
+
+export const hasUserNotFoundExample = detailedInfoErrorExample(
+  404,
+  'Пользователь не найден!',
+  'Not Found',
+  '/user/has_user/test_1',
+);
