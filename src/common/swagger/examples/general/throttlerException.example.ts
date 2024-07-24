@@ -1,7 +1,9 @@
+import { defaultErrorExample } from '../../../utils/examplesErrors.util';
+
 export const throttlerExceptionExample = (path: string) => {
-  return {
-    status: 429,
-    error: 'ThrottlerException: Too Many Requests',
+  return defaultErrorExample(
+    429,
+    'ThrottlerException: Too Many Requests',
     path,
-  };
+  );
 };
