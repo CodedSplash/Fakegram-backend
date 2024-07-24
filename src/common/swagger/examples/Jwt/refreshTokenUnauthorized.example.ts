@@ -1,44 +1,32 @@
-import { getSchemaPath } from '@nestjs/swagger';
-
 import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
+import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
+import { manyExamples } from '../../../utils/manyExamples.util';
 
 export const refreshTokenAuthorizationErrorExample = {
+  type: DetailedInfoErrorResponseType,
   summary: 'Ошибка авторизации!',
-  value: {
-    status: 401,
-    error: {
-      message: 'Ошибка авторизации!',
-      error: 'Unauthorized',
-      statusCode: 401,
-    },
-    path: '/jwt_token/refresh_token/',
-  },
+  value: detailedInfoErrorExample(
+    401,
+    'Ошибка авторизации!',
+    'Unauthorized',
+    '/jwt_token/refresh_token/',
+  ),
 };
 
 export const refreshTokenNotDetectedExample = {
+  type: DetailedInfoErrorResponseType,
   summary: 'Токен не обнаружен!',
-  value: {
-    status: 401,
-    error: {
-      message: 'Токен не обнаружен!',
-      error: 'Unauthorized',
-      statusCode: 401,
-    },
-    path: '/jwt_token/refresh_token/',
-  },
+  value: detailedInfoErrorExample(
+    401,
+    'Токен не обнаружен!',
+    'Unauthorized',
+    '/jwt_token/refresh_token/',
+  ),
 };
 
-export const refreshTokenUnauthorized = {
+export const refreshTokenUnauthorized = manyExamples({
   'application/json': {
-    schema: {
-      oneOf: [
-        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
-        { $ref: getSchemaPath(DetailedInfoErrorResponseType) },
-      ],
-    },
-    examples: {
-      refreshTokenAuthorizationErrorExample,
-      refreshTokenNotDetectedExample,
-    },
+    refreshTokenAuthorizationErrorExample,
+    refreshTokenNotDetectedExample,
   },
-};
+});
