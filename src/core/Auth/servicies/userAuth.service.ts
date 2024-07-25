@@ -1,6 +1,12 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HmacSHA256 } from 'crypto-js';
+import { UserLoginDto } from 'src/application/dtos/Auth/userLogin.dto';
 import { UserRegistrationDto } from 'src/application/dtos/Auth/userRegistration.dto';
 import { GenerateJwtTokenDto } from '../../../application/dtos/Jwt/generateJwtToken.dto';
 import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
@@ -10,6 +16,7 @@ import { IJwtTokenService } from '../../Jwt/servicies/jwtToken.service.interface
 import { UserProfileService } from '../../UserProfile/servicies/userProfile.service';
 import { IUserProfileService } from '../../UserProfile/servicies/userProfile.service.interface';
 import { IUserAuthRepository } from '../repositories/userAuth.repository.interface';
+import { IUserLoginResult } from '../types/userLoginResult.type';
 import { IUserRegistrationResult } from '../types/userRegistrationResult.interface';
 import { IUserAuthService } from './userAuth.service.interface';
 
@@ -23,6 +30,30 @@ export class UserAuthService implements IUserAuthService {
     @Inject(UserProfileService) readonly userService: IUserProfileService,
     private readonly configService: ConfigService,
   ) {}
+
+  async login(dto: UserLoginDto): Promise<IUserLoginResult> {
+    const user = await this.userAuthRepository.getUser(dto.username);
+
+    if (!user) throw new UnauthorizedException('Вы ввели неверные данные!');
+
+    const validationPassword = HmacSHA256(
+      dto.password,
+      this.configService.get('SECRET_PASSWORD_KEY'),
+    ).toString();
+
+    if (validationPassword !== user.password)
+      throw new UnauthorizedException('Вы ввели неверные данные!');
+
+    const jwtDto = new GenerateJwtTokenDto(user);
+    const jwt = await this.jwtTokenService.generateTokens(jwtDto);
+
+    await this.jwtTokenService.refreshToken(jwt.refreshToken);
+
+    return {
+      jwt,
+      user,
+    };
+  }
 
   async registration(
     dto: UserRegistrationDto,
