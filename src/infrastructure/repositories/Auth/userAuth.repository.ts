@@ -9,6 +9,18 @@ import UserAuthMapper from '../../mappers/Auth/userAuth.mapper';
 export class UserAuthRepository implements IUserAuthRepository {
   constructor(private readonly orm: PrismaService) {}
 
+  async getUser(username: string): Promise<IUserAuth | null> {
+    const user = await this.orm.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) return null;
+
+    return UserAuthMapper.toDomain(user);
+  }
+
   async createUser(dto: UserRegistrationDto): Promise<IUserAuth> {
     const user = await this.orm.user.create({
       data: {
