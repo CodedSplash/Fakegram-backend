@@ -6,6 +6,7 @@ import {
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
+import { Public } from '../../../common/decorators/isPublic.decorator';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
 import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
 import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
@@ -25,6 +26,7 @@ export class UserProfileController {
     private readonly userProfileService: IUserProfileService,
   ) {}
 
+  @Public()
   @Get('has_user/:username')
   @ApiOkResponse({
     description: 'Пользователь найден!',

@@ -9,6 +9,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
+import { Public } from 'src/common/decorators/isPublic.decorator';
 import { userLoginExample } from '../../../common/swagger/examples/Auth/userLogin.example';
 import { userLoginUnauthorizedExample } from '../../../common/swagger/examples/Auth/userLoginUnauthorized.example';
 import { userRegistrationBadRequestExample } from '../../../common/swagger/examples/Auth/userRegistrationBadRequest.example';
@@ -34,6 +35,7 @@ export class UserAuthController {
     @Inject(UserAuthService) private readonly userAuthService: IUserAuthService,
   ) {}
 
+  @Public()
   @Post('registration')
   @ApiCreatedResponse({
     description: 'Пользователь был успешно зарегистрирован!',
@@ -71,6 +73,7 @@ export class UserAuthController {
     };
   }
 
+  @Public()
   @Post('login')
   @ApiCreatedResponse({
     description: 'Пользователь был успешно авторизован!',

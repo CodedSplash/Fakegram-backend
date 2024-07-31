@@ -11,6 +11,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import { Public } from '../../../common/decorators/isPublic.decorator';
 import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
 import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
 import { refreshTokenResponseExample } from '../../../common/swagger/examples/Jwt/refreshTokenResponse.example';
@@ -31,6 +32,7 @@ export class RefreshJwtTokenController {
     @Inject(JwtTokenService) private readonly jwtTokenService: IJwtTokenService,
   ) {}
 
+  @Public()
   @Put('refresh_token')
   @ApiBearerAuth()
   @ApiOperation({
