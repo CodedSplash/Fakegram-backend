@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from 'prisma/generated/prisma/enums';
 import { GenerateDtoParameterType } from '../../../common/types/dtoParameter.type';
 
 export class GenerateJwtTokenDto {

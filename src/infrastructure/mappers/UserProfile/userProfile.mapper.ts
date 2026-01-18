@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from 'prisma/generated/prisma/client';
 import { DomainModelMapper } from '../../../common/types/domainModelMapper.type';
 import { IUserProfile } from '../../../core/UserProfile/entities/userProfile.entity';
 
