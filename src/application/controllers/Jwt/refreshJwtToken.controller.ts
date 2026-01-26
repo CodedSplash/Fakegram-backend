@@ -11,18 +11,17 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Public } from '../../../common/decorators/isPublic.decorator';
-import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
-import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
-import { refreshTokenResponseExample } from '../../../common/swagger/examples/Jwt/refreshTokenResponse.example';
-import { refreshTokenUnauthorized } from '../../../common/swagger/examples/Jwt/refreshTokenUnauthorized.example';
-import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
-import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
-
-import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
+import { Public } from '../../decorators/isPublic.decorator';
 import { JwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service';
 import { IJwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service.interface';
 import { RefreshTokenResponseDto } from '../../dtos/Jwt/refreshTokenResponse.dto';
+import { internalServerErrorExample } from 'src/application/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from 'src/application/swagger/examples/general/throttlerException.example';
+import { refreshTokenResponseExample } from 'src/application/swagger/examples/Jwt/refreshTokenResponse.example';
+import { refreshTokenUnauthorized } from 'src/application/swagger/examples/Jwt/refreshTokenUnauthorized.example';
+import { hasUserNotFoundExample } from 'src/application/swagger/examples/UserProfile/hasUserNotFound.example';
+import { DefaultErrorResponseType } from 'src/application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from 'src/application/types/DetailedInfoErrorResponse.type';
 
 @Controller('jwt_token')
 @ApiTags('Jwt token')

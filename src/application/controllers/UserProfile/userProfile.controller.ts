@@ -6,17 +6,16 @@ import {
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
-import { Public } from '../../../common/decorators/isPublic.decorator';
-import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
-import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
-import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
-import { hasUserResponseExample } from '../../../common/swagger/examples/UserProfile/hasUserResponse.example';
-import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
-
-import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
+import { Public } from '../../decorators/isPublic.decorator';
 import { UserProfileService } from '../../../core/UserProfile/servicies/userProfile.service';
 import { IUserProfileService } from '../../../core/UserProfile/servicies/userProfile.service.interface';
 import { HasUserResponseDto } from '../../dtos/UserProfile/hasUserResponse.dto';
+import { internalServerErrorExample } from 'src/application/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from 'src/application/swagger/examples/general/throttlerException.example';
+import { hasUserNotFoundExample } from 'src/application/swagger/examples/UserProfile/hasUserNotFound.example';
+import { hasUserResponseExample } from 'src/application/swagger/examples/UserProfile/hasUserResponse.example';
+import { DefaultErrorResponseType } from 'src/application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from 'src/application/types/DetailedInfoErrorResponse.type';
 
 @Controller('user')
 @ApiTags('User profile')

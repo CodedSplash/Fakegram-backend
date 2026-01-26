@@ -1,5 +1,5 @@
 import { Role } from 'prisma/generated/prisma/enums';
-import { GenerateDtoParameterType } from '../../../common/types/dtoParameter.type';
+import { GenerateDtoParameterType } from 'src/application/types/dtoParameter.type';
 
 export class GenerateJwtTokenDto {
   readonly id: number;

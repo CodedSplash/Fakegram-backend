@@ -5,14 +5,14 @@ import {
   MAX_USERNAME_LENGTH,
   MIN_PASSWORD_LENGTH,
   MIN_USERNAME_LENGTH,
-} from '../../../common/constants/validation.constants';
-import { userRegistrationRequestExample } from '../../../common/swagger/examples/Auth/userRegistrationRequest.example';
+} from '../../constants/validation.constants';
+import { userRegistrationRequestExample } from 'src/application/swagger/examples/Auth/userRegistrationRequest.example';
 import {
   fieldNotEmptyMessage,
   fieldTypeMessage,
-  generateMaxLengthMessage,
   generateMinLengthMessage,
-} from '../../../common/utils/validationMessages.util';
+  generateMaxLengthMessage,
+} from 'src/application/utils/validationMessages.util';
 
 export class UserLoginDto {
   @ApiProperty({

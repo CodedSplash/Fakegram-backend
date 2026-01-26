@@ -16,15 +16,15 @@ import {
   MIN_NAME_LENGTH,
   MIN_PASSWORD_LENGTH,
   MIN_USERNAME_LENGTH,
-} from '../../../common/constants/validation.constants';
-import { IsOlderThan } from '../../../common/decorators/isOlderThan.decorator';
-import { userRegistrationRequestExample } from '../../../common/swagger/examples/Auth/userRegistrationRequest.example';
+} from '../../constants/validation.constants';
+import { IsOlderThan } from '../../decorators/isOlderThan.decorator';
+import { userRegistrationRequestExample } from 'src/application/swagger/examples/Auth/userRegistrationRequest.example';
 import {
-  fieldNotEmptyMessage,
   fieldTypeMessage,
-  generateMaxLengthMessage,
   generateMinLengthMessage,
-} from '../../../common/utils/validationMessages.util';
+  generateMaxLengthMessage,
+  fieldNotEmptyMessage,
+} from 'src/application/utils/validationMessages.util';
 
 export class UserRegistrationDto {
   @ApiProperty({

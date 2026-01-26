@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../../../common/decorators/isPublic.decorator';
+import { IS_PUBLIC_KEY } from '../../decorators/isPublic.decorator';
 import { JwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service';
 import { IJwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service.interface';
 
