@@ -11,17 +11,17 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Public } from '../../decorators/isPublic.decorator';
-import { JwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service';
-import { IJwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service.interface';
-import { RefreshTokenResponseDto } from '../../dtos/Jwt/refreshTokenResponse.dto';
-import { internalServerErrorExample } from 'src/application/swagger/examples/general/internalServerError.example';
-import { throttlerExceptionExample } from 'src/application/swagger/examples/general/throttlerException.example';
-import { refreshTokenResponseExample } from 'src/application/swagger/examples/Jwt/refreshTokenResponse.example';
-import { refreshTokenUnauthorized } from 'src/application/swagger/examples/Jwt/refreshTokenUnauthorized.example';
-import { hasUserNotFoundExample } from 'src/application/swagger/examples/UserProfile/hasUserNotFound.example';
-import { DefaultErrorResponseType } from 'src/application/types/defaultErrorResponse.type';
-import { DetailedInfoErrorResponseType } from 'src/application/types/DetailedInfoErrorResponse.type';
+import { Public } from '@application/decorators/isPublic.decorator';
+import { JwtTokenService } from '@core/Jwt/servicies/jwtToken.service';
+import { IJwtTokenService } from '@core/Jwt/servicies/jwtToken.service.interface';
+import { RefreshTokenResponseDto } from '@application/dtos/Jwt/refreshTokenResponse.dto';
+import { internalServerErrorExample } from '@application/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '@application/swagger/examples/general/throttlerException.example';
+import { refreshTokenResponseExample } from '@application/swagger/examples/Jwt/refreshTokenResponse.example';
+import { refreshTokenUnauthorized } from '@application/swagger/examples/Jwt/refreshTokenUnauthorized.example';
+import { hasUserNotFoundExample } from '@application/swagger/examples/UserProfile/hasUserNotFound.example';
+import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
 
 @Controller('jwt_token')
 @ApiTags('Jwt token')

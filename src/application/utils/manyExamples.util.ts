@@ -1,5 +1,5 @@
 import { getSchemaPath } from '@nestjs/swagger';
-import { IBase, IManyExamples } from '../types/manyExamples.type';
+import { IBase, IManyExamples } from '@application/types/manyExamples.type';
 
 export const manyExamples = (examples: IManyExamples): IBase => {
   const base: IBase = {};

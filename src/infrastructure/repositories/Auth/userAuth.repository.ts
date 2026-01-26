@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { UserRegistrationDto } from 'src/application/dtos/Auth/userRegistration.dto';
-import { IUserAuth } from 'src/core/Auth/entities/userAuth.entity';
-import { IUserAuthRepository } from '../../../core/Auth/repositories/userAuth.repository.interface';
-import { PrismaService } from '../../db/orm/prisma.service';
-import UserAuthMapper from '../../mappers/Auth/userAuth.mapper';
+import { UserRegistrationDto } from '@application/dtos/Auth/userRegistration.dto';
+import { IUserAuth } from '@core/Auth/entities/userAuth.entity';
+import { IUserAuthRepository } from '@core/Auth/repositories/userAuth.repository.interface';
+import { PrismaService } from '@infrastructure/db/orm/prisma.service';
+import UserAuthMapper from '@infrastructure/mappers/Auth/userAuth.mapper';
 
 @Injectable()
 export class UserAuthRepository implements IUserAuthRepository {

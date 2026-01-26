@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { JwtTokensDto } from '../Jwt/jwtTokens.dto';
-import { UserResponseDto } from './userResponse.dto';
+import { JwtTokensDto } from '@application/dtos/Jwt/jwtTokens.dto';
+import { UserResponseDto } from '@application/dtos/Auth/userResponse.dto';
 
 export class UserLoginResultDto {
   @ApiProperty()

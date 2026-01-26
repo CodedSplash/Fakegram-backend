@@ -1,8 +1,8 @@
-import { GenerateJwtTokenDto } from '../../../application/dtos/Jwt/generateJwtToken.dto';
-import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
-import { IJwtTokenPayload } from '../types/jwtTokenPayload.interface';
-import { IJwtTokens } from '../types/jwtTokens.interface';
-import { IRefreshJwtToken } from '../entities/refreshJwtToken.entity';
+import { GenerateJwtTokenDto } from '@application/dtos/Jwt/generateJwtToken.dto';
+import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
+import { IJwtTokenPayload } from '@core/Jwt/types/jwtTokenPayload.interface';
+import { IJwtTokens } from '@core/Jwt/types/jwtTokens.interface';
+import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
 
 export interface IJwtTokenService {
   getRefreshToken(refreshToken: string): Promise<IRefreshJwtToken>;

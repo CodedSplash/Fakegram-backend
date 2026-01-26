@@ -1,8 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { UserProfileRepository } from '../../../infrastructure/repositories/UserProfile/userProfile.repository';
-import { IUserProfile } from '../entities/userProfile.entity';
-import { IUserProfileRepository } from '../repositories/userProfile.repository.interface';
-import { IUserProfileService } from './userProfile.service.interface';
+import { UserProfileRepository } from '@infrastructure/repositories/UserProfile/userProfile.repository';
+import { IUserProfile } from '@core/UserProfile/entities/userProfile.entity';
+import { IUserProfileRepository } from '@core/UserProfile/repositories/userProfile.repository.interface';
+import { IUserProfileService } from '@core/UserProfile/servicies/userProfile.service.interface';
 
 @Injectable()
 export class UserProfileService implements IUserProfileService {

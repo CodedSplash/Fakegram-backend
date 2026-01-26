@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ErrorResponseInfo, ErrorResponseType } from './errorResponse.type';
+import {
+  ErrorResponseInfo,
+  ErrorResponseType,
+} from '@application/types/errorResponse.type';
 
 class ValidationErrorInfo extends ErrorResponseInfo {
   @ApiProperty({

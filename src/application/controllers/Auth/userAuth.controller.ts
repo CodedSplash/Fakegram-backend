@@ -9,22 +9,22 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { Public } from 'src/application/decorators/isPublic.decorator';
-import { UserAuthService } from '../../../core/Auth/servicies/userAuth.service';
-import { IUserAuthService } from '../../../core/Auth/servicies/userAuth.service.interface';
-import { UserLoginDto } from '../../dtos/Auth/userLogin.dto';
-import { UserLoginResultDto } from '../../dtos/Auth/userLoginResult.dto';
-import { UserRegistrationDto } from '../../dtos/Auth/userRegistration.dto';
-import { UserResponseDto } from '../../dtos/Auth/userResponse.dto';
-import { userLoginExample } from 'src/application/swagger/examples/Auth/userLogin.example';
-import { userLoginUnauthorizedExample } from 'src/application/swagger/examples/Auth/userLoginUnauthorized.example';
-import { userRegistrationBadRequestExample } from 'src/application/swagger/examples/Auth/userRegistrationBadRequest.example';
-import { userRegistrationCreateExample } from 'src/application/swagger/examples/Auth/userRegistrationCreate.example';
-import { internalServerErrorExample } from 'src/application/swagger/examples/general/internalServerError.example';
-import { throttlerExceptionExample } from 'src/application/swagger/examples/general/throttlerException.example';
-import { DefaultErrorResponseType } from 'src/application/types/defaultErrorResponse.type';
-import { DetailedInfoErrorResponseType } from 'src/application/types/DetailedInfoErrorResponse.type';
-import { ValidationErrorResponseType } from 'src/application/types/validationErrorResponse.type';
+import { Public } from '@application/decorators/isPublic.decorator';
+import { UserAuthService } from '@core/Auth/servicies/userAuth.service';
+import { IUserAuthService } from '@core/Auth/servicies/userAuth.service.interface';
+import { UserLoginDto } from '@application/dtos/Auth/userLogin.dto';
+import { UserLoginResultDto } from '@application/dtos/Auth/userLoginResult.dto';
+import { UserRegistrationDto } from '@application/dtos/Auth/userRegistration.dto';
+import { UserResponseDto } from '@application/dtos/Auth/userResponse.dto';
+import { userLoginExample } from '@application/swagger/examples/Auth/userLogin.example';
+import { userLoginUnauthorizedExample } from '@application/swagger/examples/Auth/userLoginUnauthorized.example';
+import { userRegistrationBadRequestExample } from '@application/swagger/examples/Auth/userRegistrationBadRequest.example';
+import { userRegistrationCreateExample } from '@application/swagger/examples/Auth/userRegistrationCreate.example';
+import { internalServerErrorExample } from '@application/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '@application/swagger/examples/general/throttlerException.example';
+import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { ValidationErrorResponseType } from '@application/types/validationErrorResponse.type';
 
 @Controller('auth')
 @ApiTags('Auth')

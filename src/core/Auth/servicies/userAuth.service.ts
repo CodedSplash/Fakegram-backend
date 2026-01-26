@@ -6,19 +6,19 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HmacSHA256 } from 'crypto-js';
-import { UserLoginDto } from 'src/application/dtos/Auth/userLogin.dto';
-import { UserRegistrationDto } from 'src/application/dtos/Auth/userRegistration.dto';
-import { GenerateJwtTokenDto } from '../../../application/dtos/Jwt/generateJwtToken.dto';
-import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
-import { UserAuthRepository } from '../../../infrastructure/repositories/Auth/userAuth.repository';
-import { JwtTokenService } from '../../Jwt/servicies/jwtToken.service';
-import { IJwtTokenService } from '../../Jwt/servicies/jwtToken.service.interface';
-import { UserProfileService } from '../../UserProfile/servicies/userProfile.service';
-import { IUserProfileService } from '../../UserProfile/servicies/userProfile.service.interface';
-import { IUserAuthRepository } from '../repositories/userAuth.repository.interface';
-import { IUserLoginResult } from '../types/userLoginResult.type';
-import { IUserRegistrationResult } from '../types/userRegistrationResult.interface';
-import { IUserAuthService } from './userAuth.service.interface';
+import { UserLoginDto } from '@application/dtos/Auth/userLogin.dto';
+import { UserRegistrationDto } from '@application/dtos/Auth/userRegistration.dto';
+import { GenerateJwtTokenDto } from '@application/dtos/Jwt/generateJwtToken.dto';
+import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
+import { UserAuthRepository } from '@infrastructure/repositories/Auth/userAuth.repository';
+import { JwtTokenService } from '@core/Jwt/servicies/jwtToken.service';
+import { IJwtTokenService } from '@core/Jwt/servicies/jwtToken.service.interface';
+import { UserProfileService } from '@core/UserProfile/servicies/userProfile.service';
+import { IUserProfileService } from '@core/UserProfile/servicies/userProfile.service.interface';
+import { IUserAuthRepository } from '@core/Auth/repositories/userAuth.repository.interface';
+import { IUserLoginResult } from '@core/Auth/types/userLoginResult.type';
+import { IUserRegistrationResult } from '@core/Auth/types/userRegistrationResult.interface';
+import { IUserAuthService } from '@core/Auth/servicies/userAuth.service.interface';
 
 @Injectable()
 export class UserAuthService implements IUserAuthService {

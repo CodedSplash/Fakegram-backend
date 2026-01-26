@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IUserProfile } from 'src/core/UserProfile/entities/userProfile.entity';
-import { IUserProfileRepository } from '../../../core/UserProfile/repositories/userProfile.repository.interface';
-import { PrismaService } from '../../db/orm/prisma.service';
-import UserMapper from '../../mappers/UserProfile/userProfile.mapper';
+import { IUserProfile } from '@core/UserProfile/entities/userProfile.entity';
+import { IUserProfileRepository } from '@core/UserProfile/repositories/userProfile.repository.interface';
+import { PrismaService } from '@infrastructure/db/orm/prisma.service';
+import UserMapper from '@infrastructure/mappers/UserProfile/userProfile.mapper';
 
 @Injectable()
 export class UserProfileRepository implements IUserProfileRepository {

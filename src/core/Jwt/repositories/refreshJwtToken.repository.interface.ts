@@ -1,5 +1,5 @@
-import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
-import { IRefreshJwtToken } from '../entities/refreshJwtToken.entity';
+import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
+import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
 
 export interface IRefreshJwtTokenRepository {
   getRefreshToken(refreshToken: string): Promise<IRefreshJwtToken | null>;

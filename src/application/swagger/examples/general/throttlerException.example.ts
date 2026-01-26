@@ -1,4 +1,4 @@
-import { defaultErrorExample } from '../../../utils/examplesErrors.util';
+import { defaultErrorExample } from '@application/utils/examplesErrors.util';
 
 export const throttlerExceptionExample = (path: string) => {
   return defaultErrorExample(

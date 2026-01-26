@@ -1,4 +1,4 @@
-import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
+import { detailedInfoErrorExample } from '@application/utils/examplesErrors.util';
 
 export const hasUserNotFoundExample = detailedInfoErrorExample(
   404,

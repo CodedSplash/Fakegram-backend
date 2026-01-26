@@ -1,6 +1,6 @@
-import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
-import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
-import { manyExamples } from '../../../utils/manyExamples.util';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { detailedInfoErrorExample } from '@application/utils/examplesErrors.util';
+import { manyExamples } from '@application/utils/manyExamples.util';
 
 export const refreshTokenAuthorizationErrorExample = {
   type: DetailedInfoErrorResponseType,

@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { sign, verify } from 'jsonwebtoken';
-import { IUserProfileService } from 'src/core/UserProfile/servicies/userProfile.service.interface';
-import { GenerateJwtTokenDto } from '../../../application/dtos/Jwt/generateJwtToken.dto';
-import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
-import { RefreshJwtTokenRepository } from '../../../infrastructure/repositories/Jwt/refreshJwtToken.repository';
-import { UserProfileService } from '../../UserProfile/servicies/userProfile.service';
-import { IRefreshJwtToken } from '../entities/refreshJwtToken.entity';
-import { IRefreshJwtTokenRepository } from '../repositories/refreshJwtToken.repository.interface';
-import { IJwtTokenPayload } from '../types/jwtTokenPayload.interface';
-import { IJwtTokens } from '../types/jwtTokens.interface';
-import { IJwtTokenService } from './jwtToken.service.interface';
+import { IUserProfileService } from '@core/UserProfile/servicies/userProfile.service.interface';
+import { GenerateJwtTokenDto } from '@application/dtos/Jwt/generateJwtToken.dto';
+import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
+import { RefreshJwtTokenRepository } from '@infrastructure/repositories/Jwt/refreshJwtToken.repository';
+import { UserProfileService } from '@core/UserProfile/servicies/userProfile.service';
+import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
+import { IRefreshJwtTokenRepository } from '@core/Jwt/repositories/refreshJwtToken.repository.interface';
+import { IJwtTokenPayload } from '@core/Jwt/types/jwtTokenPayload.interface';
+import { IJwtTokens } from '@core/Jwt/types/jwtTokens.interface';
+import { IJwtTokenService } from '@core/Jwt/servicies/jwtToken.service.interface';
 
 @Injectable()
 export class JwtTokenService implements IJwtTokenService {

@@ -1,5 +1,5 @@
-import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
-import { detailedInfoErrorExample } from '../../../utils/examplesErrors.util';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { detailedInfoErrorExample } from '@application/utils/examplesErrors.util';
 
 export const userLoginUnauthorizedExample: DetailedInfoErrorResponseType =
   detailedInfoErrorExample(

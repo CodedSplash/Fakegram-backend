@@ -1,6 +1,6 @@
-import { DefaultErrorResponseType } from '../types/defaultErrorResponse.type';
-import { DetailedInfoErrorResponseType } from '../types/DetailedInfoErrorResponse.type';
-import { ValidationErrorResponseType } from '../types/validationErrorResponse.type';
+import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { ValidationErrorResponseType } from '@application/types/validationErrorResponse.type';
 
 export const defaultErrorExample = (
   status: number,

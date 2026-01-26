@@ -1,10 +1,10 @@
-import { DetailedInfoErrorResponseType } from '../../../types/DetailedInfoErrorResponse.type';
-import { ValidationErrorResponseType } from '../../../types/validationErrorResponse.type';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { ValidationErrorResponseType } from '@application/types/validationErrorResponse.type';
 import {
   detailedInfoErrorExample,
   validationErrorExample,
-} from '../../../utils/examplesErrors.util';
-import { manyExamples } from '../../../utils/manyExamples.util';
+} from '@application/utils/examplesErrors.util';
+import { manyExamples } from '@application/utils/manyExamples.util';
 
 const userAlreadyRegisteredExample = {
   type: DetailedInfoErrorResponseType,

@@ -1,4 +1,4 @@
-import { UserLoginResultDto } from '../../../../application/dtos/Auth/userLoginResult.dto';
+import { UserLoginResultDto } from '@application/dtos/Auth/userLoginResult.dto';
 
 export const userLoginExample: UserLoginResultDto = {
   user: {
