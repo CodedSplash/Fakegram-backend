@@ -8,5 +8,7 @@ export interface IRefreshJwtTokenRepository {
 
   updateRefreshToken(dto: RefreshTokenDto): Promise<IRefreshJwtToken | null>;
 
+  deleteByUsername(username: string): Promise<void>;
+
   deleteRefreshToken(refreshToken: string): Promise<IRefreshJwtToken | null>;
 }

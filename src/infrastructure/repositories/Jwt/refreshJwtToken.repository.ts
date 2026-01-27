@@ -51,6 +51,10 @@ export class RefreshJwtTokenRepository implements IRefreshJwtTokenRepository {
     return RefreshTokenMapper.toDomain(token);
   }
 
+  async deleteByUsername(username: string): Promise<void> {
+    await this.orm.token.delete({ where: { username } });
+  }
+
   async deleteRefreshToken(
     refreshToken: string,
   ): Promise<IRefreshJwtToken | null> {

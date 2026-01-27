@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -10,8 +10,6 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Public } from '@application/decorators/isPublic.decorator';
-import { UserAuthService } from '@core/Auth/servicies/userAuth.service';
-import { IUserAuthService } from '@core/Auth/servicies/userAuth.service.interface';
 import { UserLoginDto } from '@application/dtos/Auth/userLogin.dto';
 import { UserLoginResultDto } from '@application/dtos/Auth/userLoginResult.dto';
 import { UserRegistrationDto } from '@application/dtos/Auth/userRegistration.dto';
@@ -25,13 +23,16 @@ import { throttlerExceptionExample } from '@application/swagger/examples/general
 import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
 import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
 import { ValidationErrorResponseType } from '@application/types/validationErrorResponse.type';
+import { RegistrationUseCase } from '@src/use-cases/Auth/registration.use-case';
+import { LoginUseCase } from '@src/use-cases/Auth/login.use-case';
 
 @Controller('auth')
 @ApiTags('Auth')
 @ApiExtraModels(ValidationErrorResponseType, DetailedInfoErrorResponseType)
 export class UserAuthController {
   constructor(
-    @Inject(UserAuthService) private readonly userAuthService: IUserAuthService,
+    private readonly registrationUseCase: RegistrationUseCase,
+    private readonly loginUseCase: LoginUseCase,
   ) {}
 
   @Public()
@@ -59,7 +60,7 @@ export class UserAuthController {
     @Body() dto: UserRegistrationDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { user, jwt } = await this.userAuthService.registration(dto);
+    const { user, jwt } = await this.registrationUseCase.execute(dto);
 
     res.cookie('refreshToken', jwt.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -98,7 +99,7 @@ export class UserAuthController {
     @Body() dto: UserLoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { user, jwt } = await this.userAuthService.login(dto);
+    const { user, jwt } = await this.loginUseCase.execute(dto);
 
     res.cookie('refreshToken', jwt.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,

@@ -1,4 +1,4 @@
-import { Controller, Inject, Put, Req, Res } from '@nestjs/common';
+import { Controller, Put, Req, Res } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -12,8 +12,6 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public } from '@application/decorators/isPublic.decorator';
-import { JwtTokenService } from '@core/Jwt/servicies/jwtToken.service';
-import { IJwtTokenService } from '@core/Jwt/servicies/jwtToken.service.interface';
 import { RefreshTokenResponseDto } from '@application/dtos/Jwt/refreshTokenResponse.dto';
 import { internalServerErrorExample } from '@application/swagger/examples/general/internalServerError.example';
 import { throttlerExceptionExample } from '@application/swagger/examples/general/throttlerException.example';
@@ -22,14 +20,13 @@ import { refreshTokenUnauthorized } from '@application/swagger/examples/Jwt/refr
 import { hasUserNotFoundExample } from '@application/swagger/examples/UserProfile/hasUserNotFound.example';
 import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
 import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { RefreshTokenUseCase } from '@src/use-cases/Jwt/refreshToken.use-case';
 
 @Controller('jwt_token')
 @ApiTags('Jwt token')
 @ApiExtraModels(DetailedInfoErrorResponseType)
 export class RefreshJwtTokenController {
-  constructor(
-    @Inject(JwtTokenService) private readonly jwtTokenService: IJwtTokenService,
-  ) {}
+  constructor(private readonly refreshTokenUseCase: RefreshTokenUseCase) {}
 
   @Public()
   @Put('refresh_token')
@@ -69,7 +66,7 @@ export class RefreshJwtTokenController {
   ) {
     const refreshToken = req.cookies['refreshToken'] as string;
 
-    const tokens = await this.jwtTokenService.refreshToken(refreshToken);
+    const tokens = await this.refreshTokenUseCase.execute(refreshToken);
 
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
