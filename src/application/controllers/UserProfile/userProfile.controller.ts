@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -6,25 +6,20 @@ import {
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
-import { Public } from '../../../common/decorators/isPublic.decorator';
-import { internalServerErrorExample } from '../../../common/swagger/examples/general/internalServerError.example';
-import { throttlerExceptionExample } from '../../../common/swagger/examples/general/throttlerException.example';
-import { hasUserNotFoundExample } from '../../../common/swagger/examples/UserProfile/hasUserNotFound.example';
-import { hasUserResponseExample } from '../../../common/swagger/examples/UserProfile/hasUserResponse.example';
-import { DefaultErrorResponseType } from '../../../common/types/defaultErrorResponse.type';
-
-import { DetailedInfoErrorResponseType } from '../../../common/types/DetailedInfoErrorResponse.type';
-import { UserProfileService } from '../../../core/UserProfile/servicies/userProfile.service';
-import { IUserProfileService } from '../../../core/UserProfile/servicies/userProfile.service.interface';
-import { HasUserResponseDto } from '../../dtos/UserProfile/hasUserResponse.dto';
+import { Public } from '@application/decorators/isPublic.decorator';
+import { HasUserResponseDto } from '@application/dtos/UserProfile/hasUserResponse.dto';
+import { internalServerErrorExample } from '@application/swagger/examples/general/internalServerError.example';
+import { throttlerExceptionExample } from '@application/swagger/examples/general/throttlerException.example';
+import { hasUserNotFoundExample } from '@application/swagger/examples/UserProfile/hasUserNotFound.example';
+import { hasUserResponseExample } from '@application/swagger/examples/UserProfile/hasUserResponse.example';
+import { DefaultErrorResponseType } from '@application/types/defaultErrorResponse.type';
+import { DetailedInfoErrorResponseType } from '@application/types/DetailedInfoErrorResponse.type';
+import { HasUserUseCase } from '@src/use-cases/UserProfile/hasUser.use-case';
 
 @Controller('user')
 @ApiTags('User profile')
 export class UserProfileController {
-  constructor(
-    @Inject(UserProfileService)
-    private readonly userProfileService: IUserProfileService,
-  ) {}
+  constructor(private readonly hasUserUseCase: HasUserUseCase) {}
 
   @Public()
   @Get('has_user/:username')
@@ -49,7 +44,7 @@ export class UserProfileController {
     example: internalServerErrorExample('/user/has_user/test_1'),
   })
   async hasUser(@Param('username') username: string) {
-    const user = await this.userProfileService.hasUser(username);
+    const user = await this.hasUserUseCase.execute(username);
 
     return new HasUserResponseDto(user);
   }

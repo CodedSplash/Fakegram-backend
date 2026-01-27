@@ -1,35 +1,44 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { verify } from 'jsonwebtoken';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../../../common/decorators/isPublic.decorator';
-import { JwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service';
-import { IJwtTokenService } from '../../../core/Jwt/servicies/jwtToken.service.interface';
+import { IS_PUBLIC_KEY } from '@application/decorators/isPublic.decorator';
+import { IJwtTokenPayload } from '@core/Jwt/types/jwtTokenPayload.interface';
+import { ConfigService } from '@nestjs/config';
 
+@Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    @Inject(JwtTokenService) private readonly jwtTokenService: IJwtTokenService,
+    private readonly configService: ConfigService,
     private readonly reflector: Reflector,
   ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
-    if (isPublic) return true;
+    if (isPublic) {
+      return true;
+    }
 
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
-    if (!token) throw new UnauthorizedException('Токен не найден!');
+    if (!token) {
+      throw new UnauthorizedException('Токен не найден!');
+    }
 
     try {
-      request['user'] = this.jwtTokenService.validateAccessToken(token);
+      request['user'] = verify(
+        token,
+        this.configService.get('SECRET_ACCESS_JWT_KEY'),
+      ) as IJwtTokenPayload;
     } catch {
       throw new UnauthorizedException('Токен не валиден!');
     }

@@ -1,4 +1,4 @@
-import { GenerateDtoParameterType } from '../../../common/types/dtoParameter.type';
+import { GenerateDtoParameterType } from '@application/types/dtoParameter.type';
 
 export class RefreshTokenDto {
   readonly username: string;

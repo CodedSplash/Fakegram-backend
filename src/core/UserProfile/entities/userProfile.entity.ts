@@ -1,4 +1,4 @@
-import { Role } from 'prisma/generated/prisma/enums';
+import { Role } from '@prisma-client/generated/prisma/enums';
 
 export interface IUserProfile {
   id: number;

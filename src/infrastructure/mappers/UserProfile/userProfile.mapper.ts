@@ -1,6 +1,6 @@
 import { User } from 'prisma/generated/prisma/client';
-import { DomainModelMapper } from '../../../common/types/domainModelMapper.type';
-import { IUserProfile } from '../../../core/UserProfile/entities/userProfile.entity';
+import { IUserProfile } from '@core/UserProfile/entities/userProfile.entity';
+import { DomainModelMapper } from '@infrastructure/types/domainModelMapper.type';
 
 class UserProfileMapper implements DomainModelMapper<IUserProfile, User> {
   toDomain(modelEntity: User): IUserProfile {

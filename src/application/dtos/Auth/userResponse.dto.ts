@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GenerateDtoParameterType } from '../../../common/types/dtoParameter.type';
 import { Role } from 'prisma/generated/prisma/enums';
+import { GenerateDtoParameterType } from '@application/types/dtoParameter.type';
 
 export class UserResponseDto {
   @ApiProperty()

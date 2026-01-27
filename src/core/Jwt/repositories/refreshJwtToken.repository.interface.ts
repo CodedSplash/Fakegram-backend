@@ -1,5 +1,5 @@
-import { RefreshTokenDto } from '../../../application/dtos/Jwt/refreshToken.dto';
-import { IRefreshJwtToken } from '../entities/refreshJwtToken.entity';
+import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
+import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
 
 export interface IRefreshJwtTokenRepository {
   getRefreshToken(refreshToken: string): Promise<IRefreshJwtToken | null>;
@@ -7,6 +7,8 @@ export interface IRefreshJwtTokenRepository {
   saveRefreshToken(dto: RefreshTokenDto): Promise<IRefreshJwtToken>;
 
   updateRefreshToken(dto: RefreshTokenDto): Promise<IRefreshJwtToken | null>;
+
+  deleteByUsername(username: string): Promise<void>;
 
   deleteRefreshToken(refreshToken: string): Promise<IRefreshJwtToken | null>;
 }
