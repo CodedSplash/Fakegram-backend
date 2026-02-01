@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ErrorHandlerFilter } from '@application/filters/ErrorHandler.filter';
-import { AuthGuard } from '@application/guards/Authentication/auth.guard';
+import { ErrorHandlerFilter } from '@presentation/filters/ErrorHandler.filter';
+import { AuthGuard } from '@presentation/guards/Authentication/auth.guard';
 import { throttlerOptions } from '@infrastructure/config/throttler.config';
-import { ControllerModule } from '@application/controllers/controller.module';
+import { ControllerModule } from '@presentation/controllers/controller.module';
 
 @Module({
   imports: [
