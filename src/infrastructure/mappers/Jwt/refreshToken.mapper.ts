@@ -1,5 +1,5 @@
 import { Token } from 'prisma/generated/prisma/client';
-import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
+import { IRefreshJwtToken } from '@domain/Jwt/entities/refreshJwtToken.entity';
 import { DomainModelMapper } from '@infrastructure/types/domainModelMapper.type';
 
 class RefreshTokenMapper implements DomainModelMapper<IRefreshJwtToken, Token> {

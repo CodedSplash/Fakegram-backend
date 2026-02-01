@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { RefreshTokenDto } from '@application/dtos/Jwt/refreshToken.dto';
-import { IRefreshJwtToken } from '@core/Jwt/entities/refreshJwtToken.entity';
-import { IRefreshJwtTokenRepository } from '@core/Jwt/repositories/refreshJwtToken.repository.interface';
+import { RefreshTokenDto } from '@presentation/dtos/Jwt/refreshToken.dto';
+import { IRefreshJwtToken } from '@domain/Jwt/entities/refreshJwtToken.entity';
+import { IRefreshJwtTokenRepository } from '@domain/Jwt/repositories/refreshJwtToken.repository.interface';
 import { PrismaService } from '@infrastructure/db/orm/prisma.service';
 import RefreshTokenMapper from '@infrastructure/mappers/Jwt/refreshToken.mapper';
 
