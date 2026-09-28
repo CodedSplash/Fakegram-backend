@@ -1,0 +1,132 @@
+x-prod: &prod
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: "20m"
+      max-file: "5"
+
+x-kafka-prod-env: &kafka-prod-env
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093,2@kafka-2:9093,3@kafka-3:9093
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 3000
+
+services:
+  redis:
+    <<: *prod
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required in production}
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  kafka:
+    <<: *prod
+    environment:
+      <<: *kafka-prod-env
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:?KAFKA_CLUSTER_ID is required in production}
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  kafka-2:
+    extends:
+      file: docker-compose.yml
+      service: kafka
+    <<: *prod
+    hostname: kafka-2
+    environment:
+      <<: *kafka-prod-env
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:?KAFKA_CLUSTER_ID is required in production}
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092
+    volumes:
+      - kafka-2-data:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  kafka-3:
+    extends:
+      file: docker-compose.yml
+      service: kafka
+    <<: *prod
+    hostname: kafka-3
+    environment:
+      <<: *kafka-prod-env
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:?KAFKA_CLUSTER_ID is required in production}
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092
+    volumes:
+      - kafka-3-data:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  kafka-init:
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092,kafka-2:9092,kafka-3:9092
+      KAFKA_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TOPIC_MIN_ISR: 2
+    depends_on:
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+
+  kafka-connect:
+    <<: *prod
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092,kafka-2:9092,kafka-3:9092
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+      DEBEZIUM_DB_PASSWORD: ${DEBEZIUM_DB_PASSWORD:?DEBEZIUM_DB_PASSWORD is required in production}
+    depends_on:
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  migrate:
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fakegram}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}@${POSTGRES_HOST:-pg-haproxy}:${POSTGRES_PORT:-5000}/${POSTGRES_DB:-fakegram}?schema=public
+
+  app:
+    <<: *prod
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_HOST_PORT:-8080}:8080"
+    environment:
+      MODE_ENV: prod
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fakegram}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}@${POSTGRES_HOST:-pg-haproxy}:${POSTGRES_PORT:-5000}/${POSTGRES_DB:-fakegram}?schema=public
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required in production}
+      KAFKA_BROKERS: kafka:9092,kafka-2:9092,kafka-3:9092
+      SECRET_PASSWORD_KEY: ${SECRET_PASSWORD_KEY:?SECRET_PASSWORD_KEY is required in production}
+      SECRET_ACCESS_JWT_KEY: ${SECRET_ACCESS_JWT_KEY:?SECRET_ACCESS_JWT_KEY is required in production}
+      SECRET_REFRESH_JWT_KEY: ${SECRET_REFRESH_JWT_KEY:?SECRET_REFRESH_JWT_KEY is required in production}
+    depends_on:
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+volumes:
+  kafka-2-data:
+  kafka-3-data:
