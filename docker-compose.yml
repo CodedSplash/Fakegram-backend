@@ -1,0 +1,191 @@
+name: fakegram-backend
+
+x-kafka-image: &kafka-image apache/kafka:${KAFKA_VERSION:-3.9.1}
+
+x-kafka-node: &kafka-node
+  image: *kafka-image
+  networks: [backend]
+  healthcheck:
+    test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+    interval: 10s
+    timeout: 15s
+    retries: 15
+    start_period: 30s
+
+x-kafka-env: &kafka-env
+  CLUSTER_ID: ${KAFKA_CLUSTER_ID:-KWrSJBoTQuODghI1HWJ58Q}
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_CONTROLLER_QUORUM_VOTERS: ${KAFKA_CONTROLLER_QUORUM_VOTERS:-1@kafka:9093}
+  KAFKA_LOG_DIRS: /var/lib/kafka/data
+  KAFKA_NUM_PARTITIONS: 3
+  KAFKA_DEFAULT_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+  KAFKA_MIN_INSYNC_REPLICAS: ${KAFKA_MIN_INSYNC_REPLICAS:-1}
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_MIN_INSYNC_REPLICAS:-1}
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_LOG_RETENTION_HOURS: ${KAFKA_LOG_RETENTION_HOURS:-168}
+  KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:--Xms512m -Xmx512m}
+
+services:
+  redis:
+    image: redis:${REDIS_VERSION:-7.4-alpine}
+    networks: [backend]
+    command:
+      - sh
+      - -c
+      - >-
+        exec redis-server
+        --appendonly yes
+        --appendfsync everysec
+        --maxmemory-policy noeviction
+        $${REDIS_PASSWORD:+--requirepass "$$REDIS_PASSWORD"}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "[ -n \"$$REDIS_PASSWORD\" ] && export REDISCLI_AUTH=\"$$REDIS_PASSWORD\"; redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  kafka:
+    <<: *kafka-node
+    hostname: kafka
+    environment:
+      <<: *kafka-env
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  kafka-init:
+    image: *kafka-image
+    networks: [backend]
+    entrypoint: ["/bin/sh", "/scripts/create-topics.sh"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_INTERNAL_BROKERS:-kafka:9092}
+      KAFKA_TOPICS: ${KAFKA_TOPICS:-follow:3}
+      KAFKA_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+      KAFKA_TOPIC_MIN_ISR: ${KAFKA_MIN_INSYNC_REPLICAS:-1}
+    volumes:
+      - ./docker/kafka/create-topics.sh:/scripts/create-topics.sh:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: "no"
+
+  kafka-connect:
+    image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-3.2.0.Final}
+    hostname: kafka-connect
+    networks: [backend, fakegram-db]
+    environment:
+      BOOTSTRAP_SERVERS: ${KAFKA_INTERNAL_BROKERS:-kafka:9092}
+      GROUP_ID: fakegram-connect
+      CONFIG_STORAGE_TOPIC: _connect_configs
+      OFFSET_STORAGE_TOPIC: _connect_offsets
+      STATUS_STORAGE_TOPIC: _connect_status
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_TOPIC_CREATION_ENABLE: "true"
+      CONNECT_CONFIG_PROVIDERS: env
+      CONNECT_CONFIG_PROVIDERS_ENV_CLASS: org.apache.kafka.common.config.provider.EnvVarConfigProvider
+      HEAP_OPTS: ${KAFKA_CONNECT_HEAP_OPTS:--Xms256m -Xmx512m}
+      DEBEZIUM_DB_HOST: ${POSTGRES_HOST:-pg-haproxy}
+      DEBEZIUM_DB_PORT: ${POSTGRES_PORT:-5000}
+      DEBEZIUM_DB_NAME: ${POSTGRES_DB:-fakegram}
+      DEBEZIUM_DB_USER: ${DEBEZIUM_DB_USER:-debezium}
+      DEBEZIUM_DB_PASSWORD: ${DEBEZIUM_DB_PASSWORD:-debezium}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8083/connectors >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  debezium-init:
+    image: curlimages/curl:${CURL_VERSION:-8.11.1}
+    networks: [backend]
+    entrypoint: ["/bin/sh", "/debezium/register-connectors.sh"]
+    environment:
+      CONNECT_URL: http://kafka-connect:8083
+      CONNECTORS_DIR: /debezium/connectors
+    volumes:
+      - ./docker/debezium:/debezium:ro
+    depends_on:
+      kafka-connect:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    restart: "no"
+
+  migrate:
+    build:
+      context: .
+      target: migrator
+    image: fakegram-backend-migrator:${APP_IMAGE_TAG:-latest}
+    networks: [fakegram-db]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fakegram}:${POSTGRES_PASSWORD:-fakegram}@${POSTGRES_HOST:-pg-haproxy}:${POSTGRES_PORT:-5000}/${POSTGRES_DB:-fakegram}?schema=public
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      target: production
+    image: fakegram-backend:${APP_IMAGE_TAG:-latest}
+    networks: [backend, fakegram-db]
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      MODE_ENV: ${MODE_ENV:-prod}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fakegram}:${POSTGRES_PASSWORD:-fakegram}@${POSTGRES_HOST:-pg-haproxy}:${POSTGRES_PORT:-5000}/${POSTGRES_DB:-fakegram}?schema=public
+      DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-10}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      KAFKA_BROKERS: ${KAFKA_INTERNAL_BROKERS:-kafka:9092}
+      KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID:-fakegram-backend}
+      SECRET_PASSWORD_KEY: ${SECRET_PASSWORD_KEY:-SECRET_PASSWORD_KEY}
+      SECRET_ACCESS_JWT_KEY: ${SECRET_ACCESS_JWT_KEY:-SECRET_ACCESS_JWT_KEY}
+      SECRET_REFRESH_JWT_KEY: ${SECRET_REFRESH_JWT_KEY:-SECRET_REFRESH_JWT_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(process.env.PORT||8080,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+networks:
+  backend:
+    name: ${COMPOSE_PROJECT_NAME:-fakegram-backend}-network
+  fakegram-db:
+    name: ${FAKEGRAM_DB_NETWORK:-fakegram-db-network}
+    external: true
+
+volumes:
+  redis-data:
+  kafka-data:

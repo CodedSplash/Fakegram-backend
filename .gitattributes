@@ -1,0 +1,14 @@
+# Автоматически определять текстовые файлы
+* text=auto eol=lf
+
+# Бинарные — не трогать
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary

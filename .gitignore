@@ -3,4 +3,5 @@ dist
 .vscode
 .git
 .env
-prisma/migrations
+prisma/generated
+.env.docker.prod
