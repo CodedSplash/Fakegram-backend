@@ -1,7 +1,4 @@
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { ReferenceObject, SchemaObject } from '@nestjs/swagger';
 
 interface IExample {
   summary: string;
