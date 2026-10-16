@@ -1,90 +1,56 @@
-import { sign } from 'jsonwebtoken';
-import { HmacSHA256 } from 'crypto-js';
-import { ConfigService } from '@nestjs/config';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { IUserAuthRepository } from '@domain/Auth/repositories/userAuth.repository.interface';
-import { UserAuthRepository } from '@infrastructure/repositories/Auth/userAuth.repository';
-import { RefreshTokenDto } from '@presentation/dtos/Jwt/refreshToken.dto';
-import { IUserProfileRepository } from '@domain/UserProfile/repositories/userProfile.repository.interface';
-import { UserProfileRepository } from '@infrastructure/repositories/UserProfile/userProfile.repository';
-import { UserRegistrationDto } from '@presentation/dtos/Auth/userRegistration.dto';
-import { RefreshJwtTokenRepository } from '@infrastructure/repositories/Jwt/refreshJwtToken.repository';
-import { IRefreshJwtTokenRepository } from '@domain/Jwt/repositories/refreshJwtToken.repository.interface';
-import { IUserRegistrationResult } from '@domain/Auth/types/userRegistrationResult.interface';
+import { createId } from '@paralleldrive/cuid2';
+import { Inject, Injectable } from '@nestjs/common';
+import { UserAlreadyExistsError } from '@domain/User/errors/user.errors';
+import {
+  IUserDbRepository,
+  USER_DB_REPOSITORY,
+} from '@domain/User/repositories/user.db.repository.inter';
+import {
+  IPasswordHasher,
+  PASSWORD_HASHER,
+} from '@domain/User/services/passwordHasher.inter';
+import { RegistrationInputDto } from '@application/Auth/dtos/registration.input.dto';
+import { IUserRegistrationResult } from '@domain/Jwt/types/userRegistrationResult.interface';
+import { UsernameVO } from '@domain/User/value-objects/username.vo';
+import { User } from '@domain/User/entities/user.entity';
+import { INITIAL_TOKEN_VERSION } from '@domain/User/types/userSessionState.type';
+import { TokenIssuerService } from '@application/Jwt/services/tokenIssuer.service';
 
 @Injectable()
 export class RegistrationUseCase {
   constructor(
-    @Inject(UserAuthRepository)
-    private readonly userAuthRepository: IUserAuthRepository,
-    @Inject(UserProfileRepository)
-    private readonly userProfileRepository: IUserProfileRepository,
-    @Inject(RefreshJwtTokenRepository)
-    private readonly refreshJwtTokenRepository: IRefreshJwtTokenRepository,
-    private readonly configService: ConfigService,
+    @Inject(USER_DB_REPOSITORY)
+    private readonly userDbRepository: IUserDbRepository,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: IPasswordHasher,
+    private readonly tokenIssuer: TokenIssuerService,
   ) {}
 
-  async execute(dto: UserRegistrationDto): Promise<IUserRegistrationResult> {
-    const hasUser = await this.userProfileRepository.getByUsername(
-      dto.username,
+  async execute(dto: RegistrationInputDto): Promise<IUserRegistrationResult> {
+    const hasUser = await this.userDbRepository.existsByUsername(
+      new UsernameVO(dto.username),
     );
 
     if (hasUser) {
-      throw new BadRequestException('Пользователь уже зарегистрирован.');
+      throw new UserAlreadyExistsError();
     }
 
-    const hashPassword = HmacSHA256(
-      dto.password,
-      this.configService.get('SECRET_PASSWORD_KEY'),
-    ).toString();
-
-    const userRegistrationData = {
-      ...dto,
-      password: hashPassword,
-    };
-
-    const newUser =
-      await this.userAuthRepository.createUser(userRegistrationData);
-
-    const accessToken = sign(
-      {
-        id: newUser.id,
-        username: newUser.username,
-        roles: newUser.roles,
-      },
-      this.configService.get('SECRET_ACCESS_JWT_KEY'),
-      {
-        algorithm: 'HS256',
-        expiresIn: '30m',
-      },
-    );
-
-    const refreshToken = sign(
-      {
-        id: newUser.id,
-        username: newUser.username,
-        roles: newUser.roles,
-      },
-      this.configService.get('SECRET_REFRESH_JWT_KEY'),
-      {
-        algorithm: 'HS256',
-        expiresIn: '30d',
-      },
-    );
-
-    const refreshTokenDto = new RefreshTokenDto({
-      ...newUser,
-      refreshToken,
+    const user = new User({
+      id: createId(),
+      username: dto.username,
+      email: dto.email,
+      passwordHash: await this.passwordHasher.hash(dto.password),
+      phoneNumber: dto.phoneNumber,
+      dateOfBirth: new Date(dto.fullDateBirth),
     });
 
-    await this.refreshJwtTokenRepository.saveRefreshToken(refreshTokenDto);
+    // Регистрация сразу авторизует пользователя
+    user.updateLastLogin();
 
-    return {
-      jwt: {
-        accessToken,
-        refreshToken,
-      },
-      user: newUser,
-    };
+    // Конфликт email/телефона (и гонка по username) приходит из create как 409
+    const newUser = await this.userDbRepository.create(user);
+    const jwt = await this.tokenIssuer.issue(newUser, INITIAL_TOKEN_VERSION);
+
+    return { jwt, user: newUser };
   }
 }

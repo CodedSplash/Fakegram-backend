@@ -1,82 +1,95 @@
-import { sign } from 'jsonwebtoken';
-import { HmacSHA256 } from 'crypto-js';
-import { ConfigService } from '@nestjs/config';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserLoginDto } from '@presentation/dtos/Auth/userLogin.dto';
-import { IUserAuthRepository } from '@domain/Auth/repositories/userAuth.repository.interface';
-import { IUserLoginResult } from '@domain/Auth/types/userLoginResult.type';
-import { UserAuthRepository } from '@infrastructure/repositories/Auth/userAuth.repository';
-import { IRefreshJwtTokenRepository } from '@domain/Jwt/repositories/refreshJwtToken.repository.interface';
-import { RefreshJwtTokenRepository } from '@infrastructure/repositories/Jwt/refreshJwtToken.repository';
-import { RefreshTokenDto } from '@presentation/dtos/Jwt/refreshToken.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { InvalidCredentialsError } from '@domain/User/errors/user.errors';
+import { LoginInputDto } from '@application/Auth/dtos/login.input.dto';
+import { IUserLoginResult } from '@domain/Jwt/types/userLoginResult.type';
+import { UsernameVO } from '@domain/User/value-objects/username.vo';
+import {
+  IUserDbRepository,
+  USER_DB_REPOSITORY,
+} from '@domain/User/repositories/user.db.repository.inter';
+import {
+  IPasswordHasher,
+  PASSWORD_HASHER,
+} from '@domain/User/services/passwordHasher.inter';
+import { TokenIssuerService } from '@application/Jwt/services/tokenIssuer.service';
+import { UserTokenVersionService } from '@application/Jwt/services/userTokenVersion.service';
+
+const DUMMY_PASSWORD = 'fakegram-dummy-password';
 
 @Injectable()
 export class LoginUseCase {
+  // Хеш-заглушка для несуществующих пользователей: время ответа не должно
+  // выдавать, зарегистрирован ли username
+  private dummyPasswordHash?: Promise<string>;
+
   constructor(
-    @Inject(UserAuthRepository)
-    private readonly userAuthRepository: IUserAuthRepository,
-    @Inject(RefreshJwtTokenRepository)
-    private readonly refreshJwtTokenRepository: IRefreshJwtTokenRepository,
-    private readonly configService: ConfigService,
+    @Inject(USER_DB_REPOSITORY)
+    private readonly userDbRepository: IUserDbRepository,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: IPasswordHasher,
+    private readonly tokenIssuer: TokenIssuerService,
+    private readonly userTokenVersionService: UserTokenVersionService,
   ) {}
 
-  async execute(dto: UserLoginDto): Promise<IUserLoginResult> {
-    const user = await this.userAuthRepository.getUser(dto.username);
+  async execute(dto: LoginInputDto): Promise<IUserLoginResult> {
+    const user = await this.userDbRepository.findByUsername(
+      new UsernameVO(dto.username),
+    );
 
+    // Время ответа для несуществующего пользователя то же, что для существующего
     if (!user) {
-      throw new UnauthorizedException('Вы ввели неверные данные!');
+      this.dummyPasswordHash ??= this.passwordHasher.hash(DUMMY_PASSWORD);
+      await this.passwordHasher.verify(
+        dto.password,
+        await this.dummyPasswordHash,
+      );
+      throw new InvalidCredentialsError();
     }
 
-    const hashPassword = HmacSHA256(
+    const isPasswordValid = await this.passwordHasher.verify(
       dto.password,
-      this.configService.get('SECRET_PASSWORD_KEY'),
-    ).toString();
+      user.passwordHash,
+    );
 
-    if (hashPassword !== user.password) {
-      throw new UnauthorizedException('Вы ввели неверные данные!');
+    if (!isPasswordValid) {
+      throw new InvalidCredentialsError();
     }
 
-    const accessToken = sign(
-      {
-        id: user.id,
-        username: user.username,
-        roles: user.roles,
-      },
-      this.configService.get('SECRET_ACCESS_JWT_KEY'),
-      {
-        algorithm: 'HS256',
-        expiresIn: '30m',
-      },
+    // Вход с верным паролем восстанавливает деактивированный аккаунт
+    if (!user.isActive) {
+      user.activate();
+      await this.userDbRepository.updateActive(user.id, true);
+    }
+
+    const previousHash = user.passwordHash;
+
+    // Миграция legacy HMAC-хешей и устаревших параметров argon2 при входе
+    if (this.passwordHasher.needsRehash(previousHash)) {
+      user.changePasswordHash(await this.passwordHasher.hash(dto.password));
+    }
+
+    user.updateLastLogin();
+
+    // Пишем только lastLoginAt (и перехеш, если пароль не сменили параллельно)
+    const savedUser = await this.userDbRepository.recordLogin(user.id, {
+      lastLoginAt: user.lastLoginAt ?? new Date(),
+      passwordRehash:
+        user.passwordHash !== previousHash
+          ? { previousHash, newHash: user.passwordHash }
+          : undefined,
+    });
+
+    // Аккаунт могли деактивировать между чтением и записью
+    const tokenVersion = await this.userTokenVersionService.getCurrent(
+      savedUser.id,
     );
 
-    const refreshToken = sign(
-      {
-        id: user.id,
-        username: user.username,
-        roles: user.roles,
-      },
-      this.configService.get('SECRET_REFRESH_JWT_KEY'),
-      {
-        algorithm: 'HS256',
-        expiresIn: '30d',
-      },
-    );
+    if (tokenVersion === null) {
+      throw new InvalidCredentialsError();
+    }
 
-    await this.refreshJwtTokenRepository.deleteByUsername(user.username);
+    const jwt = await this.tokenIssuer.issue(savedUser, tokenVersion);
 
-    await this.refreshJwtTokenRepository.saveRefreshToken(
-      new RefreshTokenDto({
-        username: user.username,
-        refreshToken,
-      }),
-    );
-
-    return {
-      jwt: {
-        accessToken,
-        refreshToken,
-      },
-      user,
-    };
+    return { jwt, user: savedUser };
   }
 }

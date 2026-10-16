@@ -4,20 +4,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { verify } from 'jsonwebtoken';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '@presentation/decorators/isPublic.decorator';
-import { IJwtTokenPayload } from '@domain/Jwt/types/jwtTokenPayload.interface';
-import { ConfigService } from '@nestjs/config';
+import { ValidateAccessTokenUseCase } from '@application/Jwt/validateAccessToken.use-case';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly configService: ConfigService,
+    private readonly validateAccessTokenUseCase: ValidateAccessTokenUseCase,
     private readonly reflector: Reflector,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -34,14 +32,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Токен не найден!');
     }
 
-    try {
-      request['user'] = verify(
-        token,
-        this.configService.get('SECRET_ACCESS_JWT_KEY'),
-      ) as IJwtTokenPayload;
-    } catch {
-      throw new UnauthorizedException('Токен не валиден!');
-    }
+    // Подпись, версия токена и активность пользователя; невалидный или
+    // отозванный токен — InvalidAccessTokenError (401 через ErrorHandlerFilter)
+    request['user'] = await this.validateAccessTokenUseCase.execute(token);
 
     return true;
   }
