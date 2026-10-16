@@ -1,25 +1,30 @@
-import { Token } from 'prisma/generated/prisma/client';
-import { IRefreshJwtToken } from '@domain/Jwt/entities/refreshJwtToken.entity';
+import { RefreshToken as RefreshTokenPrisma } from '@prisma-client/generated/prisma/client';
+import { RefreshToken } from '@domain/Jwt/entities/refreshToken.entity';
 import { DomainModelMapper } from '@infrastructure/types/domainModelMapper.type';
 
-class RefreshTokenMapper implements DomainModelMapper<IRefreshJwtToken, Token> {
-  toDomain(modelEntity: Token): IRefreshJwtToken {
-    const { id, username, token } = modelEntity;
+class RefreshTokenMapper implements DomainModelMapper<
+  RefreshToken,
+  RefreshTokenPrisma
+> {
+  toDomain(modelEntity: RefreshTokenPrisma): RefreshToken {
+    const { id, username, tokenHash, createdAt } = modelEntity;
 
-    return {
+    return new RefreshToken({
       id,
-      token,
       username,
-    };
+      tokenHash,
+      createdAt,
+    });
   }
 
-  toModel(domainEntity: IRefreshJwtToken): Partial<Token> {
-    const { id, username, token } = domainEntity;
+  toModel(domainEntity: RefreshToken): Partial<RefreshTokenPrisma> {
+    const { id, username, tokenHash, createdAt } = domainEntity;
 
     return {
-      id,
-      token,
-      username,
+      id: id.toString(),
+      tokenHash: tokenHash.toString(),
+      username: username.toString(),
+      createdAt,
     };
   }
 }

@@ -1,15 +1,25 @@
 import { Module } from '@nestjs/common';
-import { UserAuthController } from '@presentation/controllers/Auth/userAuth.controller';
-import { RefreshJwtTokenController } from '@presentation/controllers/Jwt/refreshJwtToken.controller';
-import { UserProfileController } from '@presentation/controllers/UserProfile/userProfile.controller';
+import { AuthController } from '@presentation/controllers/Auth/auth.controller';
+import { RefreshTokenController } from '@presentation/controllers/Jwt/refreshToken.controller';
+import { UserController } from '@presentation/controllers/User/user.controller';
+import { MeController } from '@presentation/controllers/User/me.controller';
+import { AccountController } from '@presentation/controllers/User/account.controller';
 import { ApplicationModule } from '@application/application.module';
+import { FollowController } from '@presentation/controllers/Follow/follow.controller';
+import { FollowRequestController } from '@presentation/controllers/Follow/followRequest.controller';
+import { BlockController } from '@presentation/controllers/User/block.controller';
 
 @Module({
   imports: [ApplicationModule],
   controllers: [
-    UserAuthController,
-    RefreshJwtTokenController,
-    UserProfileController,
+    AuthController,
+    RefreshTokenController,
+    UserController,
+    MeController,
+    AccountController,
+    FollowController,
+    FollowRequestController,
+    BlockController,
   ],
 })
 export class ControllerModule {}

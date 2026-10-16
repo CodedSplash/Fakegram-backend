@@ -9,3 +9,9 @@ export const fieldNotEmptyMessage = (field: string) =>
 
 export const fieldTypeMessage = (field: string, type: string) =>
   `Поле ${field} должно быть ${type}`;
+
+export const generateMinValueMessage = (field: string, min: number) =>
+  `Значение поля ${field} должно быть не меньше ${min}`;
+
+export const generateMaxValueMessage = (field: string, max: number) =>
+  `Значение поля ${field} должно быть не больше ${max}`;

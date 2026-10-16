@@ -1,4 +1,3 @@
-import { DetailedInfoErrorResponseType } from '@presentation/types/DetailedInfoErrorResponse.type';
 import { ValidationErrorResponseType } from '@presentation/types/validationErrorResponse.type';
 import {
   detailedInfoErrorExample,
@@ -6,16 +5,6 @@ import {
 } from '@presentation/utils/examplesErrors.util';
 import { manyExamples } from '@presentation/utils/manyExamples.util';
 
-const userAlreadyRegisteredExample = {
-  type: DetailedInfoErrorResponseType,
-  summary: 'Пользователь уже зарегистрирован',
-  value: detailedInfoErrorExample(
-    400,
-    'Пользователь уже зарегистрирован',
-    'Bad Request',
-    '/auth/registration/',
-  ),
-};
 const validationDataErrorExample = {
   type: ValidationErrorResponseType,
   summary: 'Ошибка при валидации данных',
@@ -29,7 +18,13 @@ const validationDataErrorExample = {
 
 export const userRegistrationBadRequestExample = manyExamples({
   'application/json': {
-    userAlreadyRegisteredExample,
     validationDataErrorExample,
   },
 });
+
+export const userRegistrationConflictExample = detailedInfoErrorExample(
+  409,
+  'Пользователь уже зарегистрирован.',
+  'Conflict',
+  '/auth/registration',
+);

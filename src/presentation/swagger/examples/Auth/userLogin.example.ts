@@ -1,17 +1,26 @@
-import { UserLoginResultDto } from '@presentation/dtos/Auth/userLoginResult.dto';
+import { UserLoginResultDto } from '@presentation/dtos/User/userLoginResult.dto';
+import { Gender, Role } from '@domain/User/enums/user.enum';
 
 export const userLoginExample: UserLoginResultDto = {
   user: {
-    id: 0,
-    name: 'Oliver',
+    id: 'tz4a98xxat96iws9zmbrgj3a',
+    displayName: 'Oliver',
     username: 'username123',
-    country: null,
     profilePhotoUrl: 'https://i.ibb.co/MhtSNNb/fakegram-user-avatar.jpg',
-    roles: ['USER'],
-    aboutMe: null,
-    registrationDate: new Date(),
+    roles: [Role.USER],
+    bio: null,
+    createdAt: new Date(),
     isVerified: false,
     isPrivate: false,
+    email: 'test@example.com',
+    phoneNumber: '+7 123 456 78 90',
+    dateOfBirth: new Date('2000-01-15T00:00:00.000Z'),
+    gender: Gender.PREFER_NOT_TO_SAY,
+    websiteUrl: 'fakegram.com/user/username123',
+    isActive: false,
+    emailVerified: false,
+    followersCount: 0,
+    followingsCount: 0,
   },
   jwt: {
     refreshToken:
