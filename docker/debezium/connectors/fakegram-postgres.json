@@ -14,7 +14,7 @@
   "publication.autocreate.mode": "disabled",
   "schema.include.list": "public",
   "table.include.list": "public.outbox_events",
-  "snapshot.mode": "initial",
+  "snapshot.mode": "no_data",
   "heartbeat.interval.ms": "10000",
   "tombstones.on.delete": "false",
   "transforms": "outbox",

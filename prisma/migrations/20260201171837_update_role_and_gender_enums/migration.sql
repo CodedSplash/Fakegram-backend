@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "Gender" ADD VALUE 'PREFER_NOT_TO_SAY';
+
+-- AlterEnum
+ALTER TYPE "Role" ADD VALUE 'MODERATOR';

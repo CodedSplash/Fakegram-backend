@@ -8,39 +8,128 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
   USER
+  MODERATOR
+  ADMIN
 }
 
 enum Gender {
   MALE
   FEMALE
+  PREFER_NOT_TO_SAY
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
-  name             String?   @db.Text
-  username         String    @unique @db.Text
-  email            String    @db.Text
-  password         String    @db.Text
-  phoneNumber      String?   @map("phone_number") @db.Text
-  country          String?   @db.Text
-  profilePhotoUrl  String?   @default("https://i.ibb.co/MhtSNNb/fakegram-user-avatar.jpg") @map("profile_photo_url")
-  fullDateBirth    DateTime @map("full_date_birth")
-  roles            Role[]    @default([USER])
-  aboutMe          String?   @map("about_me") @db.Text
-  gender           Gender?
-  registrationDate DateTime? @default(now()) @map("registration_date")
-  lastLoginDate    DateTime? @default(now()) @map("last_login_date")
-  isVerified       Boolean?  @default(false) @map("is_verified")
-  isPrivate        Boolean?  @default(false) @map("is_private")
-  emailVerified    Boolean?  @default(false) @map("email_verified")
+  id                String      @id @default(cuid())
+  username          String      @unique @db.VarChar(30)
+  email             String      @unique
+  passwordHash      String
+  phoneNumber       String      @unique @db.VarChar(20)
+  displayName       String?     @db.VarChar(30)
+  bio               String?     @db.VarChar(150)
+  profilePhotoUrl   String?
+  dateOfBirth       DateTime
+  gender            Gender?     @default(PREFER_NOT_TO_SAY)
+  websiteUrl        String?
+
+  roles             Role[]      @default([USER])
+  isVerified        Boolean     @default(false)
+  isPrivate         Boolean     @default(false)
+  isActive          Boolean     @default(true)
+  emailVerified     Boolean     @default(false)
+
+  followersCount    Int         @default(0)
+  followingsCount   Int         @default(0)
+
+  // Версия токенов: инкремент отзывает все выданные access/refresh токены
+  tokenVersion      Int         @default(0)
+
+  lastLoginAt       DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  followers         Follow[]    @relation("following")
+  following         Follow[]    @relation("follower")
+
+  sentFollowRequests     FollowRequest[] @relation("followRequestRequester")
+  receivedFollowRequests FollowRequest[] @relation("followRequestTarget")
+  blocking               UserBlock[]     @relation("blocker")
+  blockedBy              UserBlock[]     @relation("blocked")
 
   @@index([username])
+  @@index([email])
+  @@index([createdAt])
+  @@map("users")
 }
 
-model Token {
-  id       Int    @id @default(autoincrement())
-  username String @unique @db.Text
-  token    String @unique
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  // Keyset-пагинация списков подписок/подписчиков: (createdAt DESC, id DESC).
+  @@index([followerId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([followingId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("follows")
+}
+
+// Запрос на подписку на закрытый аккаунт.
+model FollowRequest {
+  id          String   @id @default(cuid())
+  requesterId String
+  targetId    String
+  createdAt   DateTime @default(now())
+
+  requester   User @relation("followRequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  target      User @relation("followRequestTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, targetId])
+  // Keyset-пагинация входящих запросов: (createdAt DESC, id DESC).
+  @@index([targetId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("follow_requests")
+}
+
+model UserBlock {
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker   User @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
+  @@map("user_blocks")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  username  String   @unique @db.Text
+  // SHA-256 хеш refresh токена (hex), сам токен в БД не хранится
+  tokenHash String   @unique @db.Char(64)
+  createdAt DateTime @default(now())
+}
+
+model OutboxEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  aggregateType String   @map("aggregatetype") @db.VarChar(255)
+  aggregateId   String   @map("aggregateid") @db.VarChar(255)
+  type          String   @db.VarChar(255)
+  payload       Json
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("outbox_events")
+}
+
+model ProcessedEvent {
+  eventId     String   @id @map("event_id")
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@index([processedAt], type: Brin)
+  @@map("processed_events")
 }
