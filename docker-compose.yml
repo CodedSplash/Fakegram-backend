@@ -70,7 +70,7 @@ services:
     entrypoint: ["/bin/sh", "/scripts/create-topics.sh"]
     environment:
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_INTERNAL_BROKERS:-kafka:9092}
-      KAFKA_TOPICS: ${KAFKA_TOPICS:-follow:3}
+      KAFKA_TOPICS: ${KAFKA_TOPICS:-follow:3,follow.dlq:3:2592000000}
       KAFKA_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
       KAFKA_TOPIC_MIN_ISR: ${KAFKA_MIN_INSYNC_REPLICAS:-1}
     volumes:
@@ -131,6 +131,8 @@ services:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
     restart: "no"
 
   migrate:
@@ -153,6 +155,8 @@ services:
       NODE_ENV: production
       PORT: 8080
       MODE_ENV: ${MODE_ENV:-prod}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
       DATABASE_URL: postgresql://${POSTGRES_USER:-fakegram}:${POSTGRES_PASSWORD:-fakegram}@${POSTGRES_HOST:-pg-haproxy}:${POSTGRES_PORT:-5000}/${POSTGRES_DB:-fakegram}?schema=public
       DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-10}
       REDIS_HOST: redis
@@ -160,6 +164,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       KAFKA_BROKERS: ${KAFKA_INTERNAL_BROKERS:-kafka:9092}
       KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID:-fakegram-backend}
+      PROCESSED_EVENTS_RETENTION_DAYS: ${PROCESSED_EVENTS_RETENTION_DAYS:-8}
       SECRET_PASSWORD_KEY: ${SECRET_PASSWORD_KEY:-SECRET_PASSWORD_KEY}
       SECRET_ACCESS_JWT_KEY: ${SECRET_ACCESS_JWT_KEY:-SECRET_ACCESS_JWT_KEY}
       SECRET_REFRESH_JWT_KEY: ${SECRET_REFRESH_JWT_KEY:-SECRET_REFRESH_JWT_KEY}
